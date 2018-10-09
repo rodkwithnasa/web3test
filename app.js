@@ -24,12 +24,14 @@ web3.eth.getBalance(acct2,(err,bal)=>{
 	console.log('acct2 bal:',web3.utils.fromWei(bal,'ether'))
 })
 
+let dir = { from: acct1, fromPk: pk1, to: acct2, toPk: pk2 }
 
-web3.eth.getTransactionCount(acct1, (err,txCount)=> {
+web3.eth.getTransactionCount(dir.from).then( function(txCount) {
 	// build
+	//console.log("Got TX count", txCount)
 	const txObject = {
 		nonce: web3.utils.toHex(txCount),
-		to: acct2,
+		to: dir.to,
 		value: web3.utils.toHex(web3.utils.toWei('1','ether')),
 		gasLimit: web3.utils.toHex(21000),
 		gasPrice: web3.utils.toHex(web3.utils.toWei('10','gwei'))
@@ -38,13 +40,14 @@ web3.eth.getTransactionCount(acct1, (err,txCount)=> {
 	// sign
 	//console.log('pk2=',pk2)
 	const tx = new Tx(txObject)
-	tx.sign(pk1)
+	tx.sign(dir.fromPk)
 	//console.log('tx=',tx)
 	const serializedTx = tx.serialize()
 	const raw = '0x' + serializedTx.toString('hex')
 	// broadcast
-	web3.eth.sendSignedTransaction(raw).then( function(txHash) { console.log(txHash); }
+	return web3.eth.sendSignedTransaction(raw)
+
+}).then( function(res) { console.log("Successful Result:", res.transactionHash)
 		//console.log('txHash',txHash)
 		//console.log('err, txHash=',err, txHash)
-	, function(err) {console.log(err);})
-})
+}).catch (function(err) {console.log( "In error catcher",err)})
