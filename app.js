@@ -25,11 +25,11 @@ web3.eth.getBalance(acct2,(err,bal)=>{
 })
 
 
-web3.eth.getTransactionCount(acct2, (err,txCount)=> {
+web3.eth.getTransactionCount(acct1, (err,txCount)=> {
 	// build
 	const txObject = {
 		nonce: web3.utils.toHex(txCount),
-		to: acct1,
+		to: acct2,
 		value: web3.utils.toHex(web3.utils.toWei('1','ether')),
 		gasLimit: web3.utils.toHex(21000),
 		gasPrice: web3.utils.toHex(web3.utils.toWei('10','gwei'))
@@ -38,13 +38,13 @@ web3.eth.getTransactionCount(acct2, (err,txCount)=> {
 	// sign
 	//console.log('pk2=',pk2)
 	const tx = new Tx(txObject)
-	tx.sign(pk2)
+	tx.sign(pk1)
 	//console.log('tx=',tx)
 	const serializedTx = tx.serialize()
 	const raw = '0x' + serializedTx.toString('hex')
 	// broadcast
-	web3.eth.sendSignedTransaction(raw, (err,txHash)=> {
+	web3.eth.sendSignedTransaction(raw).then( function(txHash) { console.log(txHash); }
 		//console.log('txHash',txHash)
-		console.log('err, txHash=',err, txHash)
-	})
+		//console.log('err, txHash=',err, txHash)
+	, function(err) {console.log(err);})
 })
