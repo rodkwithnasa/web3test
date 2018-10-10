@@ -15,20 +15,18 @@ const pk2 = Buffer.from(process.env.PK2,'hex')
 //console.log('PK2=',process.env.PK2);
 //console.log('pk2=',pk2);
 
+let dir = process.argv[2] == 'from1' ? { from: acct1, fromPk: pk1, to: acct2, toPk: pk2 } :
+	{ from: acct2, fromPk: pk2, to: acct1, toPk: pk1 }
 
-web3.eth.getBalance(acct1,(err,bal)=>{
-	console.log('acct1 bal:',web3.utils.fromWei(bal,'ether'))
-})
-
-web3.eth.getBalance(acct2,(err,bal)=>{
-	console.log('acct2 bal:',web3.utils.fromWei(bal,'ether'))
-})
-
-let dir = { from: acct1, fromPk: pk1, to: acct2, toPk: pk2 }
-
-web3.eth.getTransactionCount(dir.from).then( function(txCount) {
+web3.eth.getBalance(dir.from).then( function(bal) {
+	console.log('From acct', dir.from, ' bal:',web3.utils.fromWei(bal,'ether'))
+	return web3.eth.getBalance(dir.to)
+}).then( function(bal) {
+	console.log('To acct', dir.to, ' bal:',web3.utils.fromWei(bal,'ether'))
+	return web3.eth.getTransactionCount(dir.from)
+}).then( function(txCount) {
 	// build
-	//console.log("Got TX count", txCount)
+	console.log("Got TX count:", txCount)
 	const txObject = {
 		nonce: web3.utils.toHex(txCount),
 		to: dir.to,
@@ -50,4 +48,4 @@ web3.eth.getTransactionCount(dir.from).then( function(txCount) {
 }).then( function(res) { console.log("Successful Result:", res.transactionHash)
 		//console.log('txHash',txHash)
 		//console.log('err, txHash=',err, txHash)
-}).catch (function(err) {console.log( "In error catcher",err)})
+}).catch( function(err) { console.log( "In error catcher:",err)})
