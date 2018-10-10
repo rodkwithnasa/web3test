@@ -6,19 +6,48 @@ const web3 = new Web3('https://ropsten.infura.io/v3/ababe5982ca4452da54adcc689e4
 
 const acct1 = '0xC017001dD04Bee0756cb64DEE5D3dAc298EdDFCD'
 const acct2 = '0xaD7e7Bcd70941569185c7064F2C0b5AEeA5acd74'
+var pk1;
+var pk2;
+var dir;
 
-const pk1 = Buffer.from(process.env.PK1,'hex')
+var pk1Promise = new Promise(function(resolve, reject) {
+  // do a thing, possibly async, then…
+
+  if (process.env.PK1 != null) {
+	pk1 = Buffer.from(process.env.PK1,'hex')
+    resolve("PK1 present");
+  }
+  else {
+    reject(Error("Need to define PK1"));
+  }
+})
+var pk2Promise = new Promise(function(resolve, reject) {
+  // do a thing, possibly async, then…
+
+  if (process.env.PK2 != null) {
+	pk2 = Buffer.from(process.env.PK2,'hex')
+    resolve("PK2 present");
+  }
+  else {
+    reject(Error("Need to define PK2"));
+  }
+})
 //console.log('PK1=',process.env.PK1);
 //console.log('pk1=',pk1);
 
-const pk2 = Buffer.from(process.env.PK2,'hex')
 //console.log('PK2=',process.env.PK2);
 //console.log('pk2=',pk2);
 
-let dir = process.argv[2] == 'from1' ? { from: acct1, fromPk: pk1, to: acct2, toPk: pk2 } :
-	{ from: acct2, fromPk: pk2, to: acct1, toPk: pk1 }
+pk1Promise.then( function(res) {
+	console.log(res)
+	return pk2Promise
+}).then( function(res){
+	console.log(res)
+	dir = process.argv[2] == 'from1' ? { from: acct1, fromPk: pk1, to: acct2, toPk: pk2 } :
+		{ from: acct2, fromPk: pk2, to: acct1, toPk: pk1 }
 
-web3.eth.getBalance(dir.from).then( function(bal) {
+	return web3.eth.getBalance(dir.from)
+}).then( function(bal) {
 	console.log('From acct', dir.from, ' bal:',web3.utils.fromWei(bal,'ether'))
 	return web3.eth.getBalance(dir.to)
 }).then( function(bal) {
