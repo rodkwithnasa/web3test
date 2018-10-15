@@ -10,7 +10,7 @@ var pk1;
 var pk2;
 var dir;
 
-var pk1Promise = new Promise(function(resolve, reject) {
+var pkPromises = [new Promise(function(resolve, reject) {
   // do a thing, possibly async, then…
 
   if (process.env.PK1 != null) {
@@ -18,10 +18,10 @@ var pk1Promise = new Promise(function(resolve, reject) {
     resolve("PK1 present");
   }
   else {
-    reject(Error("Need to define PK1"));
+    reject( Error("Need to define PK1"));
   }
-})
-var pk2Promise = new Promise(function(resolve, reject) {
+}),
+new Promise(function(resolve, reject) {
   // do a thing, possibly async, then…
 
   if (process.env.PK2 != null) {
@@ -29,23 +29,25 @@ var pk2Promise = new Promise(function(resolve, reject) {
     resolve("PK2 present");
   }
   else {
-    reject(Error("Need to define PK2"));
+    reject( Error("Need to define PK2"));
   }
 })
-//console.log('PK1=',process.env.PK1);
-//console.log('pk1=',pk1);
+]
+console.log('PK1=',process.env.PK1);
 
-//console.log('PK2=',process.env.PK2);
-//console.log('pk2=',pk2);
+console.log('PK2=',process.env.PK2);
 
-pk1Promise.then( function(res) {
+Promise.all(pkPromises).then( function(res) {
 	console.log(res)
-	return pk2Promise
-}).then( function(res){
-	console.log(res)
+	console.log('pk1=',pk1)
+	console.log('pk2=',pk2);
 	dir = process.argv[2] == 'from1' ? { from: acct1, fromPk: pk1, to: acct2, toPk: pk2 } :
 		{ from: acct2, fromPk: pk2, to: acct1, toPk: pk1 }
+		console.log(dir)
 
+	return Promise.resolve('Dir set')
+}).then( function(res){
+	console.log(res)
 	return web3.eth.getBalance(dir.from)
 }).then( function(bal) {
 	console.log('From acct', dir.from, ' bal:',web3.utils.fromWei(bal,'ether'))
@@ -63,7 +65,7 @@ pk1Promise.then( function(res) {
 		gasLimit: web3.utils.toHex(21000),
 		gasPrice: web3.utils.toHex(web3.utils.toWei('10','gwei'))
 	}
-	//console.log(txObject)
+	console.log(txObject)
 	// sign
 	//console.log('pk2=',pk2)
 	const tx = new Tx(txObject)
@@ -77,4 +79,5 @@ pk1Promise.then( function(res) {
 }).then( function(res) { console.log("Successful Result:", res.transactionHash)
 		//console.log('txHash',txHash)
 		//console.log('err, txHash=',err, txHash)
-}).catch( function(err) { console.log( "In error catcher:",err)})
+}).catch( function(err) { console.log( "In error catcher:",err)
+}).then( function(res) { console.log("All done")} )
