@@ -350,9 +350,19 @@ Promise.all(pkPromises).then( function(res) {
 	]
 
 	contract = new web3.eth.Contract(contractAbi,contractAddress)
-		contract.events.Transfer(undefined,function(err,event) {
-			if (err) { console.log('Error=',err) } else { console.log('Event=',event) }
+	var myPromise = new Promise( function(resolve,reject) {
+			contract.events.Transfer().on('data', function(event){
+    		resolve(event)
+		}).on('changed', function(event){
+    		resolve('Removed')
+		}).on('error', function(err) {
+			reject(err)
 		})
+	})
+
+	return myPromise
+}).then( function(event) {
+	console.log('Event=',event)
 }).catch( function(err) {
 	console.log( "In error catcher:",err)
 }).then( function(res) { console.log("All done")} )
