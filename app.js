@@ -1,6 +1,7 @@
 const Tx = require('ethereumjs-tx')
 const Web3 = require('web3')
-const web3 = new Web3('https://ropsten.infura.io/v3/ababe5982ca4452da54adcc689e42d04')
+//const web3 = new Web3('https://ropsten.infura.io/v3/ababe5982ca4452da54adcc689e42d04')
+const web3 = new Web3(new Web3.providers.WebsocketProvider('wss://ropsten.infura.io/ws'));
 const BigNumber = require('bignumber.js');
 
 // console.log(web3.eth.accounts.create())
@@ -349,44 +350,9 @@ Promise.all(pkPromises).then( function(res) {
 	]
 
 	contract = new web3.eth.Contract(contractAbi,contractAddress)
-	return contract.methods.balanceOf(dir.from).call()
-}).then( function(bal) {
-	console.log('From bal=',bal)
-	return contract.methods.balanceOf(dir.to).call()
-}).then( function(bal) {
-
-	console.log('To bal=',bal)
-
-	const amount = new BigNumber('1000000000000000000')
-
-	const data = contract.methods.transfer(dir.to,amount.toString()).encodeABI()
-
-	const txObject = {
-		nonce: web3.utils.toHex(nonce),
-		gasLimit: web3.utils.toHex(1000000),
-		gasPrice: web3.utils.toHex(web3.utils.toWei('10','gwei')),
-		to: contractAddress,
-		data: data
-	}
-	//console.log(txObject)
-	// sign
-	//console.log('pk2=',pk2)
-	const tx = new Tx(txObject)
-	tx.sign(dir.fromPk)
-	//console.log('tx=',tx)
-	const serializedTx = tx.serialize()
-	const raw = '0x' + serializedTx.toString('hex')
-	// broadcast
-	return web3.eth.sendSignedTransaction(raw)
-
-}).then( function(res) { 
-	console.log("Successful Result:", res.transactionHash)
-	return contract.methods.balanceOf(dir.from).call()
-}).then( function(bal) {
-	console.log('From bal=',bal)
-	return contract.methods.balanceOf(dir.to).call()
-}).then( function(bal) {
-	console.log('To bal=',bal)
+		contract.events.Transfer(undefined,function(err,event) {
+			if (err) { console.log('Error=',err) } else { console.log('Event=',event) }
+		})
 }).catch( function(err) {
 	console.log( "In error catcher:",err)
 }).then( function(res) { console.log("All done")} )
