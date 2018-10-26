@@ -13,6 +13,7 @@ var pk2
 var dir
 var contract
 var nonce
+var tfFuncsubs
 
 var pkPromises = [new Promise(function(resolve, reject) {
   // do a thing, possibly async, then…
@@ -350,19 +351,26 @@ Promise.all(pkPromises).then( function(res) {
 	]
 
 	contract = new web3.eth.Contract(contractAbi,contractAddress)
+	tfFuncsubs = contract.events.Transfer()
+	console.dir (tfFuncsubs)
 	var myPromise = new Promise( function(resolve,reject) {
-			contract.events.Transfer().on('data', function(event){
-    		resolve(event)
-		}).on('changed', function(event){
-    		resolve('Removed')
-		}).on('error', function(err) {
-			reject(err)
+			tfFuncsubs.on('data', function(event){
+				console.log('Data callback')
+    			resolve(event)
+			}).on('changed', function(event){
+				console.log('changed callback')
+    			resolve('Removed')
+			}).on('error', function(err) {
+				console.log('error callback')
+				reject(err)
+			})
 		})
-	})
 
 	return myPromise
 }).then( function(event) {
 	console.log('Event=',event)
+	tfFuncsubs.unsubscribe()
+	console.log('unsusbscribed')
 }).catch( function(err) {
 	console.log( "In error catcher:",err)
 }).then( function(res) { console.log("All done")} )
