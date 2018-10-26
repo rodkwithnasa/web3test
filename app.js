@@ -352,7 +352,7 @@ Promise.all(pkPromises).then( function(res) {
 
 	contract = new web3.eth.Contract(contractAbi,contractAddress)
 	tfFuncsubs = contract.events.Transfer()
-	console.dir (tfFuncsubs)
+	//console.dir (tfFuncsubs)
 	var myPromise = new Promise( function(resolve,reject) {
 			tfFuncsubs.on('data', function(event){
 				console.log('Data callback')
@@ -369,8 +369,12 @@ Promise.all(pkPromises).then( function(res) {
 	return myPromise
 }).then( function(event) {
 	console.log('Event=',event)
-	tfFuncsubs.unsubscribe()
-	console.log('unsusbscribed')
 }).catch( function(err) {
 	console.log( "In error catcher:",err)
-}).then( function(res) { console.log("All done")} )
+}).then( function(res) { 
+	tfFuncsubs.unsubscribe()
+	console.log('unsubscribed')
+	contract = null
+	console.log("All done")
+	process.exit(0)
+})
