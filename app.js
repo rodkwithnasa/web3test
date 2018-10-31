@@ -376,5 +376,7 @@ Promise.all(pkPromises).then( function(res) {
 	console.log('unsubscribed')
 	contract = null
 	console.log("All done")
-	process.exit(0)
+	activeReq = process._getActiveRequests()
+	console.log("Process buffer",activeReq[0].buffer.toString())
+	console.log('Files',process._getActiveHandles())
 })
