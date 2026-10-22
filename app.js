@@ -2,8 +2,24 @@ import { Web3 } from 'web3';
 import { Common, Sepolia } from '@ethereumjs/common'
 import { createLegacyTx } from '@ethereumjs/tx';
 import { hexToBytes } from '@ethereumjs/util';
+
+const apiKey = `${process.env.infura_api_key}`;
+const apiSecret = `${process.env.infura_api_key_secret}`;
+
+// Encode credentials to Base64 format for HTTP Basic Auth
+const authHeader = 'Basic ' + Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
+
+
 const provider = `https://sepolia.infura.io/v3/${process.env.infura_api_key}`;
-const web3Provider = new Web3.providers.HttpProvider(provider)
+const web3Provider = new Web3.providers.HttpProvider(provider, 
+    {
+      providerOptions: {
+        headers: {
+          'Authorization': authHeader
+        }
+      }
+    })
+	
 const web3 = new Web3(web3Provider)
 
 
