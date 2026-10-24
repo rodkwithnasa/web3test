@@ -1,5 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config({
+  override: true
+})
 import { Web3 } from 'web3';
-import { Common, Sepolia } from '@ethereumjs/common'
+import { Common, Sepolia } from '@ethereumjs/common';
 import { createLegacyTx } from '@ethereumjs/tx';
 import { hexToBytes } from '@ethereumjs/util';
 
