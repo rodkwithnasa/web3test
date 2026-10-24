@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/rodkwithnasa/web3test/compare/v1.0.0...v1.0.1) (2026-10-24)
+
+
+### Bug Fixes
+
+* remove dotenv as dependency - keep as dev only and preload ([dfd743b](https://github.com/rodkwithnasa/web3test/commit/dfd743b243cc2535927962f2102acdff4bddd7b8))
+* remove dotenv as dependency - keep as dev only and preload ([07dbabf](https://github.com/rodkwithnasa/web3test/commit/07dbabf25a95ca9aa16cae04d89ddd4f562cca7e))
+
 ## 1.0.0 (2026-10-24)
 
 
