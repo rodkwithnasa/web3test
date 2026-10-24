@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node app.js from2",
-    "start": "node app.js from1"
+    "test": "node -r dotenv/config app.js from2",
+    "start": "node -r dotenv/config app.js from1"
   },
   "author": "",
   "license": "ISC",
@@ -14,7 +14,9 @@
     "@ethereumjs/common": "^10.1.3",
     "@ethereumjs/tx": "^10.1.3",
     "@ethereumjs/util": "^10.1.3",
-    "dotenv": "^18.0.9",
     "web3": "^4.16.0"
+  },
+  "devDependencies": {
+    "dotenv": "^18.0.9"
   }
 }

@@ -1,7 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config({
-  override: true
-})
 import { Web3 } from 'web3';
 import { Common, Sepolia } from '@ethereumjs/common';
 import { createLegacyTx } from '@ethereumjs/tx';
@@ -29,8 +25,8 @@ const web3 = new Web3(web3Provider)
 
 // console.log(web3.eth.accounts.create())
 
-const acct1 = '0x305c360aefcbfca99d6bc4f6de58660f0cf0b524'
-const acct2 = '0x487BbFaa3932dbC6AE20bF783a405287765e10ED'
+const acct1 = `${process.env.acct1}` // '0x305c360aefcbfca99d6bc4f6de58660f0cf0b524'
+const acct2 = `${process.env.acct2}` // '0x487BbFaa3932dbC6AE20bF783a405287765e10ED'
 var pk1;
 var pk2;
 var dir;
