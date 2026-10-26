@@ -1,11 +1,32 @@
-const Tx = require('ethereumjs-tx')
-const Web3 = require('web3')
-const web3 = new Web3('https://ropsten.infura.io/v3/ababe5982ca4452da54adcc689e42d04')
+import { Web3 } from 'web3';
+import { Common, Sepolia } from '@ethereumjs/common';
+import { createLegacyTx } from '@ethereumjs/tx';
+import { hexToBytes } from '@ethereumjs/util';
+
+const apiKey = `${process.env.infura_api_key}`;
+const apiSecret = `${process.env.infura_api_key_secret}`;
+
+// Encode credentials to Base64 format for HTTP Basic Auth
+const authHeader = 'Basic ' + Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
+
+
+const provider = `https://sepolia.infura.io/v3/${process.env.infura_api_key}`;
+const web3Provider = new Web3.providers.HttpProvider(provider, 
+    {
+      providerOptions: {
+        headers: {
+          'Authorization': authHeader
+        }
+      }
+    })
+	
+const web3 = new Web3(web3Provider)
+
 
 // console.log(web3.eth.accounts.create())
 
-const acct1 = '0xC017001dD04Bee0756cb64DEE5D3dAc298EdDFCD'
-const acct2 = '0xaD7e7Bcd70941569185c7064F2C0b5AEeA5acd74'
+const acct1 = `${process.env.acct1}` // '0x305c360aefcbfca99d6bc4f6de58660f0cf0b524'
+const acct2 = `${process.env.acct2}` // '0x487BbFaa3932dbC6AE20bF783a405287765e10ED'
 var pk1;
 var pk2;
 var dir;
@@ -63,16 +84,26 @@ Promise.all(pkPromises).then( function(res) {
 		nonce: web3.utils.toHex(txCount),
 		gasLimit: web3.utils.toHex(1000000),
 		gasPrice: web3.utils.toHex(web3.utils.toWei('10','gwei')),
+		chainId: 11155111
 		data: data
 	}
-	console.log(txObject)
+//	console.log(txObject)
 	// sign
 	//console.log('pk2=',pk2)
-	const tx = new Tx(txObject)
-	tx.sign(dir.fromPk)
-	//console.log('tx=',tx)
-	const serializedTx = tx.serialize()
-	const raw = '0x' + serializedTx.toString('hex')
+	const common = new Common({ chain: Sepolia })
+//	console.log('Before createLegacyTx')
+	const tx = createLegacyTx(txObject, { common })
+//	console.log('After createLegacyTx')
+	//const tx = new Tx(txObject)
+	const signedTx = tx.sign(dir.fromPk)
+//	console.log('After sign')
+//	console.dir(signedTx);
+//console.log('tx=',tx)
+	const serializedTx = signedTx.serialize()
+//	console.dir(serializedTx);
+// FIX: Safely convert Uint8Array to a properly formatted hex string
+	const raw = web3.utils.bytesToHex(serializedTx) 
+
 	// broadcast
 	return web3.eth.sendSignedTransaction(raw)
 
