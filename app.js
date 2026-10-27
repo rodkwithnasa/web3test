@@ -3,7 +3,8 @@ import { Common, Sepolia } from '@ethereumjs/common';
 import { createLegacyTx } from '@ethereumjs/tx';
 import { hexToBytes } from '@ethereumjs/util';
 import contractAbi from './smartContracts/howardToken.json' with { type: 'json' }
-import { bytecode } from './smartContracts/howardTokenByteCode.json' with { type: 'json' }
+import contractByteCode from './smartContracts/howardTokenByteCode.json' with { type: 'json' }
+const bytecode = contractByteCode.bytecode;
 var contract
 var nonce
 
@@ -25,15 +26,18 @@ const web3Provider = new Web3.providers.HttpProvider(provider,
     })
 	
 const web3 = new Web3(web3Provider)
+// 1. Properly calculate your gas price as a BigInt (e.g., 10 Gwei)
+const gasPriceWei = BigInt(web3.utils.toWei('10', 'gwei')); 
 
 
 // console.log(web3.eth.accounts.create())
 
-const acct1 = `${process.env.acct1}` // '0x305c360aefcbfca99d6bc4f6de58660f0cf0b524'
-const acct2 = `${process.env.acct2}` // '0x487BbFaa3932dbC6AE20bF783a405287765e10ED'
+const acct1 = `${process.env.acct1}`
+const acct2 = `${process.env.acct2}`
 const contractAddress = `${process.env.contractAddress}`
 var pk1;
 var pk2;
+var dir;
 
 
 var pkPromises = [new Promise(function(resolve, reject) {
@@ -85,8 +89,6 @@ Promise.all(pkPromises).then( function(res) {
 	// build
 	console.log("Got TX count:", txCount)
 	nonce = txCount
-	// 1. Properly calculate your gas price as a BigInt (e.g., 10 Gwei)
-	const gasPriceWei = BigInt(web3.utils.toWei('10', 'gwei')); 
 //	const data = bytecode;
 /*
 	// 1. Define your constructor parameter types and their corresponding values
@@ -116,7 +118,7 @@ Promise.all(pkPromises).then( function(res) {
 
 	console.log('To bal=',bal)
 
-	const amount = new BigInt('1000000000000000000')
+	const amount = 1000000000000000000n
 
 	const data = contract.methods.transfer(dir.to,amount.toString()).encodeABI()
 
